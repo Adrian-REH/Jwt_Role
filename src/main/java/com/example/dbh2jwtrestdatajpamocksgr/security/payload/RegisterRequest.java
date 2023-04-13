@@ -1,5 +1,7 @@
 package com.example.dbh2jwtrestdatajpamocksgr.security.payload;
 
+import com.example.dbh2jwtrestdatajpamocksgr.entitites.User;
+
 /**
  * Datos que se almacenan de un usuario
  */
@@ -51,6 +53,16 @@ public class RegisterRequest {
         Apellido = apellido;
     }
 
+    public User getRegisterFromDto(){
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(password);
+        user.setEmail(email);
+        user.setNombre(Nombre);
+        user.setApellido(Apellido);
+
+        return user;
+    }
     @Override
     public String toString() {
         return "RegisterRequest{" +

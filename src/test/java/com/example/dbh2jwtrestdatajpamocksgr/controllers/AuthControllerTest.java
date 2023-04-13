@@ -1,7 +1,7 @@
 package com.example.dbh2jwtrestdatajpamocksgr.controllers;
+import com.example.dbh2jwtrestdatajpamocksgr.entitites.User;
 import com.example.dbh2jwtrestdatajpamocksgr.security.payload.JwtResponse;
 import com.example.dbh2jwtrestdatajpamocksgr.security.payload.LoginRequest;
-import com.example.dbh2jwtrestdatajpamocksgr.security.payload.MessageResponse;
 import com.example.dbh2jwtrestdatajpamocksgr.security.payload.RegisterRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,8 +11,6 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.*;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 
 import java.util.Arrays;
@@ -76,7 +74,7 @@ class AuthControllerTest {
     }
 
     @Test
-    void whenRegister_thenReturnMessageResponse() {
+    void whenRegisterUser_thenReturnMessageResponse() {
         registerRequest.setNombre("adrian");
         registerRequest.setApellido("herrera");
         registerRequest.setUsername("adm");//Se guarda en el servidor por ende hay que tener cuidado
@@ -84,18 +82,42 @@ class AuthControllerTest {
         registerRequest.setPassword("1234");
         HttpEntity<RegisterRequest> request = new HttpEntity<>(registerRequest, headers);
 
-        ResponseEntity<MessageResponse> response = testRestTemplate.postForEntity("/api/auth/register",request, MessageResponse.class);
+        ResponseEntity<User> response = testRestTemplate.postForEntity("/api/auth/register",request, User.class);
+
+        System.out.println(response.getBody());
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals(409, response.getStatusCodeValue());
+        //assertEquals("adm", response.getBody().getRoles());
+
+        System.out.println(response.getBody().getRoles());
+    }
+    @Test
+    void whenRegisterAdmin_thenReturnMessageResponse() {
+        registerRequest.setNombre("adrian");
+        registerRequest.setApellido("herrera");
+        registerRequest.setUsername("adm");//Se guarda en el servidor por ende hay que tener cuidado
+        registerRequest.setEmail("adr@admin.es");
+        registerRequest.setPassword("1234");
+        HttpEntity<RegisterRequest> request = new HttpEntity<>(registerRequest, headers);
+
+        ResponseEntity<User> response = testRestTemplate.postForEntity("/api/auth/register",request, User.class);
 
         System.out.println(response.getBody());
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(200, response.getStatusCodeValue());
-        assertEquals("User registered successfully!", response.getBody().getMessage());
+
+        response.getBody().getRoles().forEach(role -> {
+            System.out.println(role.getName());
+            assertEquals("USER", role.getName());
+            assertEquals("User role", role.getDescription());
+
+        });
 
     }
 
     @Test
     void whenRegisterRequestNull_thenReturnMessageResponseUMT() {
-        ResponseEntity<String > response = testRestTemplate.postForEntity("/api/auth/login",null, String.class);
+        ResponseEntity<User> response = testRestTemplate.postForEntity("/api/auth/register",null, User.class);
 
         assertEquals(HttpStatus.UNSUPPORTED_MEDIA_TYPE, response.getStatusCode());
         assertEquals(415, response.getStatusCodeValue());
@@ -111,12 +133,12 @@ class AuthControllerTest {
         registerRequest.setPassword(null);
         HttpEntity<RegisterRequest> request = new HttpEntity<>(registerRequest, headers);
 
-        ResponseEntity<MessageResponse> response = testRestTemplate.postForEntity("/api/auth/register",request, MessageResponse.class);
+        ResponseEntity<User> response = testRestTemplate.postForEntity("/api/auth/register",request, User.class);
 
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals("Error: get into User, Email and/or Password", response.getBody().getMessage());
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals(409, response.getStatusCodeValue());
+        assertNull(response.getBody().getUsername());
 
 
     }
@@ -131,12 +153,12 @@ class AuthControllerTest {
         registerRequest.setPassword("");
         HttpEntity<RegisterRequest> request = new HttpEntity<>(registerRequest, headers);
 
-        ResponseEntity<MessageResponse> response = testRestTemplate.postForEntity("/api/auth/register",request, MessageResponse.class);
+        ResponseEntity<User> response = testRestTemplate.postForEntity("/api/auth/register",request, User.class);
 
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals("Error: get into User, Email and/or Password", response.getBody().getMessage());
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals(409, response.getStatusCodeValue());
+        assertNull( response.getBody().getUsername());
 
 
     }
@@ -150,12 +172,12 @@ class AuthControllerTest {
         registerRequest.setPassword("1234");
         HttpEntity<RegisterRequest> request = new HttpEntity<>(registerRequest, headers);
 
-        ResponseEntity<MessageResponse > response = testRestTemplate.postForEntity("/api/auth/register",request, MessageResponse.class);
+        ResponseEntity<User> response = testRestTemplate.postForEntity("/api/auth/register",request, User.class);
 
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals("Error: Username is already taken!", response.getBody().getMessage());
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals(409, response.getStatusCodeValue());
+        assertNull( response.getBody().getUsername());
 
     }
     @Test
@@ -167,12 +189,11 @@ class AuthControllerTest {
         registerRequest.setPassword("1234");
         HttpEntity<RegisterRequest> request = new HttpEntity<>(registerRequest, headers);
 
-        ResponseEntity<MessageResponse > response = testRestTemplate.postForEntity("/api/auth/register",request, MessageResponse.class);
+        ResponseEntity<User> response = testRestTemplate.postForEntity("/api/auth/register",request, User.class);
 
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals("Error: Email is already in use!", response.getBody().getMessage());
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals(409, response.getStatusCodeValue());
+        assertNull( response.getBody().getUsername());
 
     }
 

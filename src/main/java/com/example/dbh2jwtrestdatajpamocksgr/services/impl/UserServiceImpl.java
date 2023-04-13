@@ -1,13 +1,16 @@
 package com.example.dbh2jwtrestdatajpamocksgr.services.impl;
 
-import com.example.dbh2jwtrestdatajpamocksgr.dto.UserDto;
 import com.example.dbh2jwtrestdatajpamocksgr.entitites.Role;
 import com.example.dbh2jwtrestdatajpamocksgr.entitites.User;
 import com.example.dbh2jwtrestdatajpamocksgr.exception.EmailAlreadyExistsException;
+import com.example.dbh2jwtrestdatajpamocksgr.exception.RegisterRequestParamNullException;
+import com.example.dbh2jwtrestdatajpamocksgr.exception.UsernameAlreadyExistsException;
 import com.example.dbh2jwtrestdatajpamocksgr.repositories.UserRepository;
+import com.example.dbh2jwtrestdatajpamocksgr.security.payload.RegisterRequest;
 import com.example.dbh2jwtrestdatajpamocksgr.services.RoleService;
 import com.example.dbh2jwtrestdatajpamocksgr.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -64,15 +67,43 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         throw new NoSuchElementException("No se ha encontrado el usuario solicitado.");
     }
 
+    /**
+     * Check si no ingreso parametros nulos o en blanco
+     * Check si el usuario existe
+     * Check si el email existe
+     *
+     * codifico la contraseña
+     *
+     * Check su email para saber su rol y lo genero
+     * Guardo el usuario y el rol
+     *
+     * Nota:
+     * @param user
+     * @return
+     */
     @Override
-    public User save(UserDto user) {
+    public User save(RegisterRequest user) {
+        User nUser = user.getRegisterFromDto();
 
-        User nUser = user.getUserFromDto();
+        // Check 1: ParamIsNull
+        if (nUser.getPassword()==null||nUser.getUsername()==null||nUser.getEmail()==null)
+            throw new RegisterRequestParamNullException("Ingrese una clave, usuario y/ email");
 
+        // Check 2: ParamIsBlank
+        if (nUser.getPassword().isBlank()||nUser.getUsername().isBlank()||nUser.getEmail().isBlank())
+            throw new RegisterRequestParamNullException("Ingrese una clave, usuario y/ email");
+
+        // Check 3: username
+        if(userRepository.existsByUsername(nUser.getUsername()))
+            throw new UsernameAlreadyExistsException("User  ocupado");
+
+        // Check 4: email
         if(userRepository.existsByEmail(nUser.getEmail()))
             throw new EmailAlreadyExistsException("Email ocupado");
 
+
         nUser.setPassword(bcryptEncoder.encode(user.getPassword()));
+
 
         Role role = roleService.findByName("USER");
         Set<Role> roleSet = new HashSet<>();
@@ -83,7 +114,12 @@ public class UserServiceImpl implements UserDetailsService, UserService {
             roleSet.add(role);
         }
 
+
         nUser.setRoles(roleSet);
         return userRepository.save(nUser);
+
+
     }
+
+
 }

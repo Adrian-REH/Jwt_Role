@@ -1,14 +1,20 @@
 package com.example.dbh2jwtrestdatajpamocksgr.repositories;
 
+import com.example.dbh2jwtrestdatajpamocksgr.entitites.Role;
 import com.example.dbh2jwtrestdatajpamocksgr.entitites.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.context.TestPropertySource;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest
+@TestPropertySource(locations = "/application-test.properties")
 public class UserRepositoryDataJpaTestIT {
 
     @Autowired
@@ -18,6 +24,24 @@ public class UserRepositoryDataJpaTestIT {
     private UserRepository userRepository;
 
 
+    @Test
+    public void whenSaveUsername_thenReturnUser(){
+        User user = createUser();
+        entityManager.persist(user);
+        entityManager.flush();
+
+        User b = userRepository.save(user);
+        assertThat(b.getUsername())
+                .isEqualTo(user.getUsername());
+
+
+        b.getRoles().forEach( role -> {
+            assertThat(role.getName())
+                    .isEqualTo("ADMIN");
+            }
+        );
+
+    }
     @Test
     public void whenFindByUsername_thenReturnUser(){
         User user = createUser();
@@ -54,11 +78,20 @@ public class UserRepositoryDataJpaTestIT {
 
     private User createUser() {
         User user = new User();
-        user.setApellido("");
-        user.setNombre("");
+        Role role = new Role();
+
+        role.setName("ADMIN");
+        role.setDescription("admin role");
+        Set<Role> roleSet = new HashSet<>();
+        roleSet.add(role);
+
+
+        user.setApellido("Herrera");
+        user.setNombre("Adrian Elias");
         user.setUsername("Adrian");
         user.setEmail("adrian@gmail.com");
-        user.setPassword("");
+        user.setPassword("dexter");
+        user.setRoles( roleSet);
         return user;
     }
 }

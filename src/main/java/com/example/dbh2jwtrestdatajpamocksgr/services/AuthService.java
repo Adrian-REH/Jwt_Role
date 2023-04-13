@@ -5,7 +5,6 @@ import com.example.dbh2jwtrestdatajpamocksgr.entitites.User;
 import com.example.dbh2jwtrestdatajpamocksgr.repositories.UserRepository;
 import com.example.dbh2jwtrestdatajpamocksgr.security.payload.JwtResponse;
 import com.example.dbh2jwtrestdatajpamocksgr.security.payload.LoginRequest;
-import com.example.dbh2jwtrestdatajpamocksgr.security.payload.MessageResponse;
 import com.example.dbh2jwtrestdatajpamocksgr.security.payload.RegisterRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,12 +15,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 /**
- * Controlador para llevar a cabo la autenticación utilizando JWT
+ * Servicio que lleva a cabo la autenticación utilizando JWT
  *
  * Se utiliza AuthenticationManager para autenticar las credenciales que son el
  * usuario y password que llegan por POST en el cuerpo de la petición
  *
  * Si las credenciales son válidas se genera un token JWT como respuesta
+ *
+ *
  */
 @Service
 public class AuthService {
@@ -29,20 +30,22 @@ public class AuthService {
 
     private final AuthenticationManager authManager;
     private final UserRepository userRepository;
+    private final UserService userService;
     private final PasswordEncoder encoder;
     private final TokenProvider jwtTokenUtil;
 
     public AuthService(AuthenticationManager authManager,
-                          UserRepository userRepository,
-                          PasswordEncoder encoder,
+                       UserRepository userRepository,
+                       UserService userService, PasswordEncoder encoder,
                        TokenProvider jwtTokenUtil){
         this.authManager = authManager;
         this.userRepository = userRepository;
+        this.userService = userService;
         this.encoder = encoder;
         this.jwtTokenUtil = jwtTokenUtil;
     }
 
-    public ResponseEntity<JwtResponse> login( LoginRequest loginRequest){
+    public JwtResponse login( LoginRequest loginRequest){
 
         final Authentication authentication = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -53,97 +56,23 @@ public class AuthService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         final String token = jwtTokenUtil.generateToken(authentication);
 
-        return ResponseEntity.ok(new JwtResponse(token));
+        return new JwtResponse(token);
     }
 
 
 
-
-    public ResponseEntity<MessageResponse> register(@RequestBody RegisterRequest signUpRequest) {
-
-        if (signUpRequest.getPassword()==null||signUpRequest.getUsername()==null||signUpRequest.getEmail()==null){
-            return ResponseEntity.ok(new MessageResponse("Error: get into User, Email and/or Password"));
-        }
-        if (signUpRequest.getPassword().isBlank()||signUpRequest.getUsername().isBlank()||signUpRequest.getEmail().isBlank()){
-            return ResponseEntity.ok(new MessageResponse("Error: get into User, Email and/or Password"));
-
-        }
-            // Check 1: username
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Username is already taken!"));
-        }
-
-        // Check 2: email
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Email is already in use!"));
-        }
-
-        // Creo un nuevo usuario
-        User user = new User(null,signUpRequest.getUsername(),signUpRequest.getNombre(),signUpRequest.getApellido(),signUpRequest.getEmail(),encoder.encode(signUpRequest.getPassword()));
-
-        userRepository.save(user);
-
-
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
-    }
-
-    /**
-     * Es demasiado inseguro para aplicarlo en produccion, deberia enviar un email...
-     * @param signUpRequest
-     * @return
-     */
-    public ResponseEntity<MessageResponse> update(@RequestBody RegisterRequest signUpRequest) {
-        User user = new User(null,signUpRequest.getUsername(),signUpRequest.getNombre(),signUpRequest.getApellido(),signUpRequest.getEmail(),encoder.encode(signUpRequest.getPassword()));
-
-        // Check 1: username
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            userRepository.save(user);
-            return ResponseEntity.ok(new MessageResponse("User modified successfully!"));
-
-        }
-
-        // Check 2: email
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            userRepository.save(user);
-            return ResponseEntity.ok(new MessageResponse("User modified successfully!"));
-
-        }
-
-
-        return ResponseEntity.ok(new MessageResponse("Error: User not registered"));
-    }
-
-    /**
-     * Es demasiado inseguro para aplicarlo en produccion, deberia enviar un email...
-     * @param signUpRequest
-     * @return
-     */
-    public ResponseEntity<MessageResponse> delete(@RequestBody RegisterRequest signUpRequest) {
-        User user = new User(null,signUpRequest.getUsername(),signUpRequest.getNombre(),signUpRequest.getApellido(),signUpRequest.getEmail(),encoder.encode(signUpRequest.getPassword()));
-
-        // Check 1: username
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            userRepository.delete(user);
-            return ResponseEntity.ok(new MessageResponse("User deleted successfully!"));
-
-        }
-
-        // Check 2: email
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            userRepository.delete(user);
-            return ResponseEntity.ok(new MessageResponse("User deleted successfully!"));
-
-        }
-
-
-        return ResponseEntity.ok(new MessageResponse("Error: User not registered"));
+    public User register( RegisterRequest signUpRequest) {
+        return userService.save(signUpRequest);
     }
 
 
+    public User recuperar(){
+        return new User();
+    }
+
+    public User borrar(){
+        return new User();
+    }
 
 
 }
