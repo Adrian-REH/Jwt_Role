@@ -1,8 +1,8 @@
 package com.example.dbh2jwtrestdatajpamocksgr.services;
 
+import com.example.dbh2jwtrestdatajpamocksgr.security.config.TokenProvider;
 import com.example.dbh2jwtrestdatajpamocksgr.entitites.User;
 import com.example.dbh2jwtrestdatajpamocksgr.repositories.UserRepository;
-import com.example.dbh2jwtrestdatajpamocksgr.security.jwt.JwtTokenUtil;
 import com.example.dbh2jwtrestdatajpamocksgr.security.payload.JwtResponse;
 import com.example.dbh2jwtrestdatajpamocksgr.security.payload.LoginRequest;
 import com.example.dbh2jwtrestdatajpamocksgr.security.payload.MessageResponse;
@@ -14,7 +14,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 /**
  * Controlador para llevar a cabo la autenticación utilizando JWT
@@ -26,15 +25,17 @@ import org.springframework.web.bind.annotation.RequestBody;
  */
 @Service
 public class AuthService {
+
+
     private final AuthenticationManager authManager;
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
-    private final JwtTokenUtil jwtTokenUtil;
+    private final TokenProvider jwtTokenUtil;
 
     public AuthService(AuthenticationManager authManager,
                           UserRepository userRepository,
                           PasswordEncoder encoder,
-                          JwtTokenUtil jwtTokenUtil){
+                       TokenProvider jwtTokenUtil){
         this.authManager = authManager;
         this.userRepository = userRepository;
         this.encoder = encoder;
@@ -43,15 +44,16 @@ public class AuthService {
 
     public ResponseEntity<JwtResponse> login( LoginRequest loginRequest){
 
-        Authentication authentication = authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-
+        final Authentication authentication = authManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getUsername(),
+                        loginRequest.getPassword()
+                )
+        );
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        final String token = jwtTokenUtil.generateToken(authentication);
 
-        String jwt = jwtTokenUtil.generateJwtToken(authentication);
-
-
-        return ResponseEntity.ok(new JwtResponse(jwt));
+        return ResponseEntity.ok(new JwtResponse(token));
     }
 
 

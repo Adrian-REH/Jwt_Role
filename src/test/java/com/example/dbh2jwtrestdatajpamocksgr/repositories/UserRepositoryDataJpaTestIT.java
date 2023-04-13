@@ -24,7 +24,7 @@ public class UserRepositoryDataJpaTestIT {
         entityManager.persist(user);
         entityManager.flush();
 
-        User b = userRepository.findByUsername("Adrian").orElseThrow();
+        User b = userRepository.findByUsername("Adrian");
         assertThat(b.getUsername())
                 .isEqualTo(user.getUsername());
 

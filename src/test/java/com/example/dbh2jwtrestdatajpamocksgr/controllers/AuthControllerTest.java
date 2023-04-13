@@ -175,4 +175,6 @@ class AuthControllerTest {
         assertEquals("Error: Email is already in use!", response.getBody().getMessage());
 
     }
+
+
 }

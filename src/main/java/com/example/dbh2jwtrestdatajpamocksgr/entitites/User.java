@@ -2,9 +2,10 @@ package com.example.dbh2jwtrestdatajpamocksgr.entitites;
 
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
-@Table(name="app_users")
+@Table(name="ob_user")
 public class User {
 
 
@@ -12,12 +13,32 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column
     private String username;
+    @Column
     private String Nombre;
+    @Column
     private String Apellido;
+    @Column
     private String email;
+    @Column
     private String password;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "USER_ROLES",
+            joinColumns = {
+                    @JoinColumn(name = "USER_ID")
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name = "ROLE_ID") })
+    private Set<Role> roles;
 
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
 
     public User() {}
 
