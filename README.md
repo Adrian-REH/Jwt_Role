@@ -129,6 +129,8 @@ Authorization: Bearer <token>
 1.  Spring Anotation
 ```java
     @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+    @TestPropertySource(locations = "/application-test.properties")
+
 ```
 2. Headers
 ```java

@@ -35,19 +35,19 @@ public class AuthController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/hello-admin")
-    public String adminPing(){
+    public String adminHello(){
         return "Hola!, bienvenido a la seccion Administracion";
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/hello-admin-user")
-    public String adminUser(){
+    public String adminUserHello(){
         return "Hola! Bienvenido a la seccion Usuario administrador";
     }
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/hello-user")
-    public String userPing(){
+    public String userHello(){
         return "Hola! Bienvenido a la seccion Usuario";
     }
 

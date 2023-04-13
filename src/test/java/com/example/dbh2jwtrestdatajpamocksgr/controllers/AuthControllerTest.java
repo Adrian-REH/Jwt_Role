@@ -45,7 +45,6 @@ class AuthControllerTest {
     }
 
 
-
     @Test
     void whenLogin_thenReturnJwtResponse() {
         loginRequest.setUsername("adrian");
@@ -91,6 +90,7 @@ class AuthControllerTest {
 
         System.out.println(response.getBody().getRoles());
     }
+    
     @Test
     void whenRegisterAdmin_thenReturnMessageResponse() {
         registerRequest.setNombre("adrian");
@@ -142,8 +142,7 @@ class AuthControllerTest {
 
 
     }
-
-
+    
     @Test
     void whenRegisterRequestParmIsBlank_thenReturnMessageResponseISE() {
         registerRequest.setNombre("");
@@ -180,6 +179,7 @@ class AuthControllerTest {
         assertNull( response.getBody().getUsername());
 
     }
+    
     @Test
     void whenRegisterEmailExist_thenReturnMessageResponseEmailExist() {
         registerRequest.setNombre(null);
@@ -194,6 +194,48 @@ class AuthControllerTest {
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
         assertEquals(409, response.getStatusCodeValue());
         assertNull( response.getBody().getUsername());
+
+    }
+
+    @Test
+    void AdminHelloHowAdmin(){
+        generoToken("adrian2");
+
+        HttpEntity<LoginRequest> request = new HttpEntity<>( headers);
+        ResponseEntity<String> response = testRestTemplate.exchange("/api/auth/hello-admin", HttpMethod.GET,request, String.class);
+
+        String result = response.getBody();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("Hola!, bienvenido a la seccion Administracion", result);
+
+
+    }
+    @Test
+    void AdminHelloHowUser(){
+         generoToken("adrian");
+
+        HttpEntity<LoginRequest> request = new HttpEntity<>( headers);
+        ResponseEntity<String> response = testRestTemplate.exchange("/api/auth/hello-admin", HttpMethod.GET,request, String.class);
+
+        String result = response.getBody();
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        assertEquals(403, response.getStatusCodeValue());
+        assertNotEquals("Hola!, bienvenido a la seccion Administracion", result);
+
+    }
+
+
+    void generoToken(String username){
+        loginRequest.setUsername(username);
+        loginRequest.setPassword("1234");
+        HttpEntity<LoginRequest> request = new HttpEntity<>(loginRequest, headers);
+        ResponseEntity<JwtResponse> response = testRestTemplate.postForEntity("/api/auth/login",request, JwtResponse.class);
+
+        JwtResponse result = response.getBody();
+        headers.setBearerAuth(result.getToken());
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
     }
 
