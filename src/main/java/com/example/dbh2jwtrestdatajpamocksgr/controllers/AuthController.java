@@ -43,29 +43,7 @@ public class AuthController {
         return ResponseEntity.ok(authService.register(signUpRequest));
     }
 
-/*
 
-    @GetMapping("/hello-admin")
-    public ResponseEntity<ByteArrayResource>  adminHello()  {
-        generateInvoice();
-        ByteArrayOutputStream outputStream = generateInvoice();
-
-        // Crea un recurso ByteArrayResource a partir del flujo de salida del PDF
-        ByteArrayResource resource = new ByteArrayResource(outputStream.toByteArray());
-
-        // Configura las cabeceras de la respuesta
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=invoice.pdf");
-
-        // Devuelve la respuesta con el recurso PDF, las cabeceras y el tipo de contenido adecuado
-        return ResponseEntity.ok()
-                .headers(headers)
-                .contentLength(outputStream.size())
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(resource);
-
-    }
-*/
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/hello-admin-user")
