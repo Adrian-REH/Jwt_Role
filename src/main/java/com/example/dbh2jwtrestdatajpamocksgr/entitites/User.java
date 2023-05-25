@@ -23,13 +23,13 @@ public class User {
     private String email;
     @Column
     private String password;
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(name = "USER_ROLES",
+    @ManyToMany
+    @JoinTable(name = "user_role",
             joinColumns = {
-                    @JoinColumn(name = "USER_ID")
+                    @JoinColumn(name = "user_id")
             },
             inverseJoinColumns = {
-                    @JoinColumn(name = "ROLE_ID") })
+                    @JoinColumn(name = "role_id") })
     private Set<Role> roles;
 
     public Set<Role> getRoles() {

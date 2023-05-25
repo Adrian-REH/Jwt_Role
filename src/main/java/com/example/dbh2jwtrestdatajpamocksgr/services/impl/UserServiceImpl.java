@@ -10,7 +10,6 @@ import com.example.dbh2jwtrestdatajpamocksgr.security.payload.RegisterRequest;
 import com.example.dbh2jwtrestdatajpamocksgr.services.RoleService;
 import com.example.dbh2jwtrestdatajpamocksgr.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -105,12 +104,12 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         nUser.setPassword(bcryptEncoder.encode(user.getPassword()));
 
 
-        Role role = roleService.findByName("USER");
+        Role role = roleService.findByName("ADMIN");
         Set<Role> roleSet = new HashSet<>();
         roleSet.add(role);
 
         if(nUser.getEmail().split("@")[1].equals("admin.edu")){
-            role = roleService.findByName("ADMIN");
+            role = roleService.findByName("ATM");
             roleSet.add(role);
         }
 

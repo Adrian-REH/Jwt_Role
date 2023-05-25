@@ -14,6 +14,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
+
 /**
  * Servicio que lleva a cabo la autenticación utilizando JWT
  *
@@ -57,6 +60,14 @@ public class AuthService {
         final String token = jwtTokenUtil.generateToken(authentication);
 
         return new JwtResponse(token);
+    }
+
+
+
+    public Iterable<User> findAll(){
+
+
+        return userRepository.findAll();
     }
 
 

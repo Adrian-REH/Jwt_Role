@@ -22,8 +22,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class AuthControllerTest {
     private final RegisterRequest registerRequest = new RegisterRequest();
     private final LoginRequest loginRequest = new LoginRequest();
-    private final HttpHeaders headers = new HttpHeaders();
 
+    private final HttpHeaders headers = new HttpHeaders();
     private TestRestTemplate testRestTemplate;
 
     @Autowired
@@ -34,8 +34,8 @@ class AuthControllerTest {
 
     @BeforeEach
     void setUp() {
-        restTemplateBuilder = restTemplateBuilder.defaultHeader("Authorization","sd")
-                .rootUri("http://localhost:"+port);
+        //restTemplateBuilder = restTemplateBuilder.defaultHeader("Authorization","sd").rootUri("http://localhost:"+port);
+        restTemplateBuilder = restTemplateBuilder.rootUri("http://localhost:"+port);
         testRestTemplate= new TestRestTemplate(restTemplateBuilder);
 
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -211,6 +211,7 @@ class AuthControllerTest {
 
 
     }
+
     @Test
     void AdminHelloHowUser(){
          generoToken("adrian");
@@ -225,14 +226,13 @@ class AuthControllerTest {
 
     }
 
-
-    void generoToken(String username){
+    void generoToken(String username) {
         loginRequest.setUsername(username);
         loginRequest.setPassword("1234");
         HttpEntity<LoginRequest> request = new HttpEntity<>(loginRequest, headers);
-        ResponseEntity<JwtResponse> response = testRestTemplate.postForEntity("/api/auth/login",request, JwtResponse.class);
-
+        ResponseEntity<JwtResponse> response = testRestTemplate.postForEntity("/api/auth/login", request, JwtResponse.class);
         JwtResponse result = response.getBody();
+
         headers.setBearerAuth(result.getToken());
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));

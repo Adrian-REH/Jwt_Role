@@ -30,11 +30,15 @@ Detalles:
 │       └── UserDetailsServiceImpl.java
 ├── services
 │   ├── AuthService.java
+│   └── AuthService.java
 ├── config
 │   └── SwaggerConfig.java
 ── test
-    └── controllers
-       └── AuthControllerTest.java
+    ├── controllers
+    │   └── AuthControllerTest.java
+    └── repositories
+        ├── RoleRepositoryDataJpaTestIt.java
+        └── UserRepositoryDataJpaTestIt.java
 
 
 ```
