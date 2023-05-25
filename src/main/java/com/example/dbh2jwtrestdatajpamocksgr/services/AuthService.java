@@ -6,6 +6,7 @@ import com.example.dbh2jwtrestdatajpamocksgr.repositories.UserRepository;
 import com.example.dbh2jwtrestdatajpamocksgr.security.payload.JwtResponse;
 import com.example.dbh2jwtrestdatajpamocksgr.security.payload.LoginRequest;
 import com.example.dbh2jwtrestdatajpamocksgr.security.payload.RegisterRequest;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,6 +29,7 @@ import java.util.List;
  *
  */
 @Service
+@AllArgsConstructor
 public class AuthService {
 
 
@@ -37,16 +39,7 @@ public class AuthService {
     private final PasswordEncoder encoder;
     private final TokenProvider jwtTokenUtil;
 
-    public AuthService(AuthenticationManager authManager,
-                       UserRepository userRepository,
-                       UserService userService, PasswordEncoder encoder,
-                       TokenProvider jwtTokenUtil){
-        this.authManager = authManager;
-        this.userRepository = userRepository;
-        this.userService = userService;
-        this.encoder = encoder;
-        this.jwtTokenUtil = jwtTokenUtil;
-    }
+
 
     public JwtResponse login( LoginRequest loginRequest){
 

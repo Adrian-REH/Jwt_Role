@@ -41,9 +41,8 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
     private Set<SimpleGrantedAuthority> getAuthority(User user) {
         Set<SimpleGrantedAuthority> authorities = new HashSet<>();
-        user.getRoles().forEach(role -> {
-            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
-        });
+
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRoles().getId()));
         return authorities;
     }
 
@@ -105,16 +104,13 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
 
         Role role = roleService.findByName("ADMIN");
-        Set<Role> roleSet = new HashSet<>();
-        roleSet.add(role);
 
         if(nUser.getEmail().split("@")[1].equals("admin.edu")){
             role = roleService.findByName("ATM");
-            roleSet.add(role);
         }
 
 
-        nUser.setRoles(roleSet);
+        nUser.setRoles(role);
         return userRepository.save(nUser);
 
 
