@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import static com.example.dbh2jwtrestdatajpamocksgr.utils.PdfUtil.generateInvoice;
 
 
 @RestController
@@ -44,6 +43,7 @@ public class AuthController {
         return ResponseEntity.ok(authService.register(signUpRequest));
     }
 
+/*
 
     @GetMapping("/hello-admin")
     public ResponseEntity<ByteArrayResource>  adminHello()  {
@@ -62,7 +62,10 @@ public class AuthController {
                 .headers(headers)
                 .contentLength(outputStream.size())
                 .contentType(MediaType.APPLICATION_PDF)
-                .body(resource);    }
+                .body(resource);
+
+    }
+*/
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/hello-admin-user")
